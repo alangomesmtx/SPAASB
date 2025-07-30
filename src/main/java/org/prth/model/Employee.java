@@ -15,6 +15,20 @@ public class Employee {
     private int salary;
     private String department;
 
+    public Employee(){
+
+    }
+
+    public Employee(int id, String name, String email, String city, int salary, String department, int age) {
+        this.empId = id;
+        this.name = name;
+        this.email = email;
+        this.city = city;
+        this.salary = salary;
+        this.department = department;
+        this.age = age;
+    }
+
     public int getEmpId() {
         return empId;
     }
@@ -72,6 +86,4 @@ public class Employee {
     }
 
     private int age;
-
-    // Getters and Setters (or use Lombok if enabled)
 }

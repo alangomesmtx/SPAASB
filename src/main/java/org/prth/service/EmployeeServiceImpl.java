@@ -45,6 +45,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    public List<Employee> getEmployeesByCity(String city) {
+        return employeeDao.findByCity(city);
+    }
+
+    @Override
     public List<Employee> getEmployeesWithSalaryGreaterThan(int salary) {
         return employeeDao.findBySalaryGreaterThan(salary);
     }

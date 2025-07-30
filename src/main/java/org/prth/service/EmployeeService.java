@@ -19,5 +19,7 @@ public interface EmployeeService {
 
     List<Employee> getEmployeesByDepartment(String department);
 
+    List<Employee> getEmployeesByCity(String city);
+
     List<Employee> getEmployeesWithSalaryGreaterThan(int salary);
 }

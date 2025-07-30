@@ -51,9 +51,15 @@ public class EmployeeController {
         return employeeService.getEmployeesByDepartment(department);
     }
 
+    // Find employees by city
+    @GetMapping("/city")
+    public List<Employee> getByCity(@RequestParam String city) {
+        return employeeService.getEmployeesByCity(city);
+    }
+
     // Find employees with salary greater than X
-    @GetMapping("/salary")
-    public List<Employee> getWithSalaryGreaterThan(@RequestParam int minSalary) {
-        return employeeService.getEmployeesWithSalaryGreaterThan(minSalary);
+    @GetMapping("/salary/above")
+    public List<Employee> getWithSalaryGreaterThan(@RequestParam int salary) {
+        return employeeService.getEmployeesWithSalaryGreaterThan(salary);
     }
 }

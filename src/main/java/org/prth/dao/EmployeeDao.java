@@ -18,5 +18,7 @@ public interface EmployeeDao {
 
     List<Employee> findByDepartment(String department);
 
+    List<Employee> findByCity(String city);
+
     List<Employee> findBySalaryGreaterThan(int salary);
 }
