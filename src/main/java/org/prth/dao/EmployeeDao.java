@@ -1,23 +1,22 @@
-package org.prth.service;
+package org.prth.dao;
 
 import org.prth.model.Employee;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface EmployeeService {
-
+public interface EmployeeDao {
     List<Employee> getAllEmployees();
 
     Optional<Employee> getEmployeeById(int id);
 
-    Employee createEmployee(Employee employee);
+    Employee saveEmployee(Employee employee);
 
     Employee updateEmployee(int id, Employee employee);
 
     void deleteEmployee(int id);
 
-    List<Employee> getEmployeesByDepartment(String department);
+    List<Employee> findByDepartment(String department);
 
-    List<Employee> getEmployeesWithSalaryGreaterThan(int salary);
+    List<Employee> findBySalaryGreaterThan(int salary);
 }

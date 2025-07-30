@@ -3,10 +3,10 @@ package org.prth.controller;
 import org.prth.model.Employee;
 import org.prth.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -15,48 +15,45 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
+    // Get all employees
     @GetMapping
     public List<Employee> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
 
+    // Get employee by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable int id) {
-        return employeeService.getEmployeeById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Optional<Employee> getEmployeeById(@PathVariable int id) {
+        return employeeService.getEmployeeById(id);
     }
 
+    // Create employee
     @PostMapping
     public Employee createEmployee(@RequestBody Employee employee) {
         return employeeService.createEmployee(employee);
     }
 
+    // Update employee
     @PutMapping("/{id}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable int id, @RequestBody Employee updatedEmployee) {
-        return ResponseEntity.ok(employeeService.updateEmployee(id, updatedEmployee));
+    public Employee updateEmployee(@PathVariable int id, @RequestBody Employee employee) {
+        return employeeService.updateEmployee(id, employee);
     }
 
+    // Delete employee
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEmployee(@RequestParam("id") int id) {
+    public void deleteEmployee(@PathVariable int id) {
         employeeService.deleteEmployee(id);
-        return ResponseEntity.noContent().build();
     }
 
+    // Find employees by department
     @GetMapping("/department")
-    public ResponseEntity<List<Employee>> getEmployeesByDepartment(@RequestParam String department) {
-        List<Employee> employees = employeeService.getEmployeesByDepartment(department);
-        return ResponseEntity.ok(employees);
+    public List<Employee> getByDepartment(@RequestParam String department) {
+        return employeeService.getEmployeesByDepartment(department);
     }
 
-    @GetMapping("/city")
-    public ResponseEntity<List<Employee>> getEmployeesByCity(@RequestParam String city) {
-        return ResponseEntity.ok(employeeService.getEmployeesByCity(city));
+    // Find employees with salary greater than X
+    @GetMapping("/salary")
+    public List<Employee> getWithSalaryGreaterThan(@RequestParam int minSalary) {
+        return employeeService.getEmployeesWithSalaryGreaterThan(minSalary);
     }
-
-    @GetMapping("/salary/above")
-    public ResponseEntity<List<Employee>> getEmployeesWithHighSalary(@RequestParam int salary) {
-        return ResponseEntity.ok(employeeService.getEmployeesWithSalaryAbove(salary));
-    }
-
 }
