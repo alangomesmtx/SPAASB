@@ -2,64 +2,73 @@ package org.prth.controller;
 
 import org.prth.model.Employee;
 import org.prth.service.EmployeeService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.prth.service.EmployeeServiceImpl;
 
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
-import java.util.Optional;
 
-@RestController
-@RequestMapping("/api/employees")
+@Path("/employees")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class EmployeeController {
 
-    @Autowired
-    private EmployeeService employeeService;
+    private final EmployeeService employeeService = new EmployeeServiceImpl();
 
-    // Get all employees
-    @GetMapping
+    @GET
+    @Path("/all")
     public List<Employee> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
 
-    // Get employee by ID
-    @GetMapping("/{id}")
-    public Optional<Employee> getEmployeeById(@PathVariable int id) {
-        return employeeService.getEmployeeById(id);
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String test() {
+        return "API is working!";
     }
 
-    // Create employee
-    @PostMapping
-    public Employee createEmployee(@RequestBody Employee employee) {
-        return employeeService.createEmployee(employee);
+    @GET
+    @Path("/{id}")
+    public Response getEmployeeById(@PathParam("id") int id) {
+        Employee emp = employeeService.getEmployeeById(id);
+        if (emp != null) {
+            return Response.ok(emp).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).entity("Employee not found").build();
+        }
     }
 
-    // Update employee
-    @PutMapping("/{id}")
-    public Employee updateEmployee(@PathVariable int id, @RequestBody Employee employee) {
-        return employeeService.updateEmployee(id, employee);
+    @POST
+    public Response addEmployee(Employee emp) {
+        boolean added = employeeService.addEmployee(emp);
+        if (added) {
+            return Response.status(Response.Status.CREATED).entity(emp).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to create employee").build();
+        }
     }
 
-    // Delete employee
-    @DeleteMapping("/{id}")
-    public void deleteEmployee(@PathVariable int id) {
-        employeeService.deleteEmployee(id);
+    @PUT
+    @Path("/{id}")
+    public Response updateEmployee(@PathParam("id") int id, Employee emp) {
+        emp.setId(id);
+        boolean updated = employeeService.updateEmployee(emp);
+        if (updated) {
+            return Response.ok(emp).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).entity("Employee not found").build();
+        }
     }
 
-    // Find employees by department
-    @GetMapping("/department")
-    public List<Employee> getByDepartment(@RequestParam String department) {
-        return employeeService.getEmployeesByDepartment(department);
-    }
-
-    // Find employees by city
-    @GetMapping("/city")
-    public List<Employee> getByCity(@RequestParam String city) {
-        return employeeService.getEmployeesByCity(city);
-    }
-
-    // Find employees with salary greater than X
-    @GetMapping("/salary/above")
-    public List<Employee> getWithSalaryGreaterThan(@RequestParam int salary) {
-        return employeeService.getEmployeesWithSalaryGreaterThan(salary);
+    @DELETE
+    @Path("/{id}")
+    public Response deleteEmployee(@PathParam("id") int id) {
+        boolean deleted = employeeService.deleteEmployee(id);
+        if (deleted) {
+            return Response.noContent().build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).entity("Employee not found").build();
+        }
     }
 }

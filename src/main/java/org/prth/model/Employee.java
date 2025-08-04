@@ -1,40 +1,21 @@
 package org.prth.model;
 
-import jakarta.persistence.*;
-
-@Entity
-@Table(name = "emp")
 public class Employee {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int empId;
-
+    private int id;
     private String name;
     private String email;
     private String city;
     private int salary;
     private String department;
 
-    public Employee(){
+    public Employee() {} // Required for frameworks
 
+    public int getId() {
+        return id;
     }
 
-    public Employee(int id, String name, String email, String city, int salary, String department, int age) {
-        this.empId = id;
-        this.name = name;
-        this.email = email;
-        this.city = city;
-        this.salary = salary;
-        this.department = department;
-        this.age = age;
-    }
-
-    public int getEmpId() {
-        return empId;
-    }
-
-    public void setEmpId(int empId) {
-        this.empId = empId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -77,13 +58,14 @@ public class Employee {
         this.department = department;
     }
 
-    public int getAge() {
-        return age;
+    public Employee(int id, String name, String email, String city, int salary, String department) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.city = city;
+        this.salary = salary;
+        this.department = department;
     }
 
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    private int age;
+    // Getters and setters...
 }

@@ -1,18 +1,13 @@
 package org.prth.service;
 
 import org.prth.dao.EmployeeDao;
+import org.prth.dao.EmployeeDaoImpl;
 import org.prth.model.Employee;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
-@Service
 public class EmployeeServiceImpl implements EmployeeService {
-
-    @Autowired
-    private EmployeeDao employeeDao;
+    private final EmployeeDao employeeDao = new EmployeeDaoImpl();
 
     @Override
     public List<Employee> getAllEmployees() {
@@ -20,37 +15,22 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Optional<Employee> getEmployeeById(int id) {
+    public Employee getEmployeeById(int id) {
         return employeeDao.getEmployeeById(id);
     }
 
     @Override
-    public Employee createEmployee(Employee employee) {
-        return employeeDao.saveEmployee(employee);
+    public boolean addEmployee(Employee employee) {
+        return employeeDao.addEmployee(employee);
     }
 
     @Override
-    public Employee updateEmployee(int id, Employee employee) {
-        return employeeDao.updateEmployee(id, employee);
+    public boolean updateEmployee(Employee employee) {
+        return employeeDao.updateEmployee(employee);
     }
 
     @Override
-    public void deleteEmployee(int id) {
-        employeeDao.deleteEmployee(id);
-    }
-
-    @Override
-    public List<Employee> getEmployeesByDepartment(String department) {
-        return employeeDao.findByDepartment(department);
-    }
-
-    @Override
-    public List<Employee> getEmployeesByCity(String city) {
-        return employeeDao.findByCity(city);
-    }
-
-    @Override
-    public List<Employee> getEmployeesWithSalaryGreaterThan(int salary) {
-        return employeeDao.findBySalaryGreaterThan(salary);
+    public boolean deleteEmployee(int id) {
+        return employeeDao.deleteEmployee(id);
     }
 }

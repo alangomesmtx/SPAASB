@@ -1,121 +1,100 @@
-package org.prth.dao;
+package org.prth.dao.impl;
 
+import org.prth.dao.EmployeeDao;
 import org.prth.model.Employee;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
+
 import java.sql.*;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-@Repository
 public class EmployeeDaoImpl implements EmployeeDao {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final Connection connection;
+
+    public EmployeeDaoImpl(Connection connection) {
+        this.connection = connection;
+    }
+
+    @Override
+    public Employee getEmployeeById(int id) {
+        try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM emp WHERE emp_id = ?")) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return mapRow(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     @Override
     public List<Employee> getAllEmployees() {
-        String sql = "SELECT * FROM emp";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Employee.class));
-    }
-
-    @Override
-    public Optional<Employee> getEmployeeById(int id) {
-        String sql = "SELECT * FROM emp WHERE emp_id = ?";
-        List<Employee> result = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Employee.class), id);
-        return result.stream().findFirst();
-    }
-
-//    @Override
-//    public Employee saveEmployee(Employee employee) {
-//        String sql = "INSERT INTO emp(name, email, city, salary, department, age) VALUES (?, ?, ?, ?, ?, ?)";
-//        jdbcTemplate.update(sql, employee.getName(), employee.getEmail(), employee.getCity(),
-//                employee.getSalary(), employee.getDepartment(), employee.getAge());
-//        String sql_get_id = ""
-//        return employee;
-//    }
-
-    @Override
-    public Employee saveEmployee(Employee employee) {
-        String sql = "INSERT INTO emp(name, email, city, salary, department, age) VALUES (?, ?, ?, ?, ?, ?)";
-
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-
-        jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, employee.getName());
-            ps.setString(2, employee.getEmail());
-            ps.setString(3, employee.getCity());
-            ps.setInt(4, employee.getSalary());
-            ps.setString(5, employee.getDepartment());
-            ps.setInt(6, employee.getAge());
-            return ps;
-        }, keyHolder);
-
-        // Set the generated empId to the employee object
-        Number generatedId = keyHolder.getKey();
-        if (generatedId != null) {
-            employee.setEmpId(generatedId.intValue());
+        List<Employee> list = new ArrayList<>();
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery("SELECT * FROM emp");
+            while (rs.next()) {
+                list.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-
-        return employee;
+        return list;
     }
-
 
     @Override
-    public Employee updateEmployee(int id, Employee employee) {
-        // Step 1: Fetch current employee from DB
-        String selectSql = "SELECT * FROM emp WHERE emp_id = ?";
-        Employee existingEmployee = jdbcTemplate.queryForObject(selectSql,
-                new BeanPropertyRowMapper<>(Employee.class), id);
-
-        if (existingEmployee == null) {
-            throw new RuntimeException("Employee with id " + id + " not found");
+    public void saveEmployee(Employee employee) {
+        String sql = "INSERT INTO emp (name, email, city, salary, department, age) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, employee.getName());
+            stmt.setString(2, employee.getEmail());
+            stmt.setString(3, employee.getCity());
+            stmt.setInt(4, employee.getSalary());
+            stmt.setString(5, employee.getDepartment());
+            stmt.setInt(6, employee.getAge());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-
-        // Step 2: Fill missing fields with existing values
-        String name = (employee.getName() != null) ? employee.getName() : existingEmployee.getName();
-        String email = (employee.getEmail() != null) ? employee.getEmail() : existingEmployee.getEmail();
-        String city = (employee.getCity() != null) ? employee.getCity() : existingEmployee.getCity();
-        int salary = (employee.getSalary() != 0) ? employee.getSalary() : existingEmployee.getSalary();
-        String department = (employee.getDepartment() != null) ? employee.getDepartment() : existingEmployee.getDepartment();
-        int age = (employee.getAge() != 0) ? employee.getAge() : existingEmployee.getAge();
-
-        // Step 3: Update with merged values
-        String updateSql = "UPDATE emp SET name=?, email=?, city=?, salary=?, department=?, age=? WHERE emp_id=?";
-        jdbcTemplate.update(updateSql, name, email, city, salary, department, age, id);
-
-        // Set and return updated employee
-        return new Employee(id, name, email, city, salary, department, age);
     }
 
+    @Override
+    public void updateEmployee(Employee employee) {
+        String sql = "UPDATE emp SET name=?, email=?, city=?, salary=?, department=?, age=? WHERE emp_id=?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, employee.getName());
+            stmt.setString(2, employee.getEmail());
+            stmt.setString(3, employee.getCity());
+            stmt.setInt(4, employee.getSalary());
+            stmt.setString(5, employee.getDepartment());
+            stmt.setInt(6, employee.getAge());
+            stmt.setInt(7, employee.getEmpId());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void deleteEmployee(int id) {
-        String sql = "DELETE FROM emp WHERE emp_id = ?";
-        jdbcTemplate.update(sql, id);
+        try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM emp WHERE emp_id=?")) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    @Override
-    public List<Employee> findByDepartment(String department) {
-        String sql = "SELECT * FROM emp WHERE department = ?";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Employee.class), department);
-    }
-
-    @Override
-    public List<Employee> findByCity(String city) {
-        String sql = "SELECT * FROM emp WHERE city = ?";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Employee.class), city);
-    }
-
-    @Override
-    public List<Employee> findBySalaryGreaterThan(int salary) {
-        String sql = "SELECT * FROM emp WHERE salary > ?";
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Employee.class), salary);
+    private Employee mapRow(ResultSet rs) throws SQLException {
+        return new Employee(
+                rs.getInt("emp_id"),
+                rs.getString("name"),
+                rs.getString("email"),
+                rs.getString("city"),
+                rs.getInt("salary"),
+                rs.getString("department"),
+                rs.getInt("age")
+        );
     }
 }
