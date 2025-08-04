@@ -17,4 +17,6 @@ public interface EmployeeDao {
     boolean deleteEmployee(int id);
 
     List<Employee> getEmployeesWithMinSalary(int minSalary);
+
+    List<Employee> getEmployeesByCity(String city);
 }

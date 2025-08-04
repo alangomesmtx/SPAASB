@@ -118,6 +118,22 @@ public class EmployeeDaoImpl implements EmployeeDao {
         return employees;
     }
 
+    @Override
+    public List<Employee> getEmployeesByCity(String city){
+        String sql = "SELECT * FROM emp WHERE city = ?";
+        List<Employee> employees = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, city);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                employees.add(mapResultSetToEmployee(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return employees;
+    }
+
     private Employee mapResultSetToEmployee(ResultSet rs) throws SQLException {
         Employee emp = new Employee();
         emp.setEmpId(rs.getInt("emp_id"));

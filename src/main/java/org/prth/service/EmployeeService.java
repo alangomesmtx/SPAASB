@@ -11,4 +11,5 @@ public interface EmployeeService {
     Employee updateEmployee(int id, Employee employee);
     boolean deleteEmployee(int id);
     List<Employee> getEmployeesWithMinSalary(int minSalary);
+    List<Employee> getEmployeesByCity(String city);
 }

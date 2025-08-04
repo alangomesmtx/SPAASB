@@ -42,4 +42,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     public List<Employee> getEmployeesWithMinSalary(int minSalary) {
         return employeeDao.getEmployeesWithMinSalary(minSalary);
     }
+
+    @Override
+    public  List<Employee> getEmployeesByCity(String city){
+        return employeeDao.getEmployeesByCity(city);
+    }
 }

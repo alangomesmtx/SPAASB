@@ -27,8 +27,8 @@ public class EmployeeController {
     }
 
     @GET
-    @Path("/{id}")
-    public Response getEmployeeById(@PathParam("id") int id) {
+    @Path("/id")
+    public Response getEmployeeById(@QueryParam("id") int id) {
         Employee employee = employeeService.getEmployeeById(id);
         if (employee != null) {
             return Response.ok(employee).build();
@@ -38,33 +38,42 @@ public class EmployeeController {
     }
 
     @POST
+    @Path("/add")
     public Response addEmployee(Employee employee) {
         Employee savedEmployee = employeeService.addEmployee(employee);
         return Response.status(Response.Status.CREATED).entity(savedEmployee).build();
     }
 
     @PUT
-    @Path("/{id}")
-    public Response updateEmployee(@PathParam("id") int id, Employee employee) {
+    @Path("/update/id")
+    public Response updateEmployee(@QueryParam("id") int id, Employee employee) {
         Employee updatedEmployee = employeeService.updateEmployee(id, employee);
         return Response.ok(updatedEmployee).build();
     }
 
     @DELETE
-    @Path("/{id}")
-    public Response deleteEmployee(@PathParam("id") int id) {
+    @Path("/delete/id")
+    public Response deleteEmployee(@QueryParam("id") int id) {
+        Employee employee = employeeService.getEmployeeById(id);
         boolean deleted = employeeService.deleteEmployee(id);
         if (deleted) {
-            return Response.noContent().build();
+            return Response.status(Response.Status.OK).entity(employee).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity("Employee not found").build();
         }
     }
 
     @GET
-    @Path("/salary")
+    @Path("/getEmployeesWithMinSalary")
     public Response getEmployeesWithMinSalary(@QueryParam("minSalary") int minSalary) {
         List<Employee> employees = employeeService.getEmployeesWithMinSalary(minSalary);
+        return Response.ok(employees).build();
+    }
+
+    @GET
+    @Path("/getEmployeesByCity")
+    public Response getEmployeesByCity(@QueryParam("city") String city) {
+        List<Employee> employees = employeeService.getEmployeesByCity(city);
         return Response.ok(employees).build();
     }
 }
