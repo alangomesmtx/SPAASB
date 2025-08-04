@@ -1,17 +1,16 @@
 package org.prth.service;
 
 import org.prth.dao.EmployeeDao;
-import org.prth.dao.EmployeeDaoImpl;
 import org.prth.model.Employee;
 
 import java.util.List;
 
 public class EmployeeServiceImpl implements EmployeeService {
-    private final EmployeeDao employeeDao = new EmployeeDaoImpl();
 
-    @Override
-    public List<Employee> getAllEmployees() {
-        return employeeDao.getAllEmployees();
+    private final EmployeeDao employeeDao;
+
+    public EmployeeServiceImpl(EmployeeDao employeeDao) {
+        this.employeeDao = employeeDao;
     }
 
     @Override
@@ -20,17 +19,27 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public boolean addEmployee(Employee employee) {
+    public List<Employee> getAllEmployees() {
+        return employeeDao.getAllEmployees();
+    }
+
+    @Override
+    public Employee addEmployee(Employee employee) {
         return employeeDao.addEmployee(employee);
     }
 
     @Override
-    public boolean updateEmployee(Employee employee) {
-        return employeeDao.updateEmployee(employee);
+    public Employee updateEmployee(int id, Employee employee) {
+        return employeeDao.updateEmployee(id, employee);
     }
 
     @Override
     public boolean deleteEmployee(int id) {
         return employeeDao.deleteEmployee(id);
+    }
+
+    @Override
+    public List<Employee> getEmployeesWithMinSalary(int minSalary) {
+        return employeeDao.getEmployeesWithMinSalary(minSalary);
     }
 }

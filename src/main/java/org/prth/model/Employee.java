@@ -1,21 +1,33 @@
 package org.prth.model;
 
 public class Employee {
-    private int id;
+    private int empId;
     private String name;
     private String email;
     private String city;
     private int salary;
     private String department;
+    private int age;
 
-    public Employee() {} // Required for frameworks
-
-    public int getId() {
-        return id;
+    public Employee() {
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public Employee(int empId, String name, String email, String city, int salary, String department, int age) {
+        this.empId = empId;
+        this.name = name;
+        this.email = email;
+        this.city = city;
+        this.salary = salary;
+        this.department = department;
+        this.age = age;
+    }
+
+    public int getEmpId() {
+        return empId;
+    }
+
+    public void setEmpId(int empId) {
+        this.empId = empId;
     }
 
     public String getName() {
@@ -58,14 +70,11 @@ public class Employee {
         this.department = department;
     }
 
-    public Employee(int id, String name, String email, String city, int salary, String department) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.city = city;
-        this.salary = salary;
-        this.department = department;
+    public int getAge() {
+        return age;
     }
 
-    // Getters and setters...
+    public void setAge(int age) {
+        this.age = age;
+    }
 }

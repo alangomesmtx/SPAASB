@@ -3,6 +3,7 @@ package org.prth.controller;
 import org.prth.model.Employee;
 import org.prth.service.EmployeeService;
 import org.prth.service.EmployeeServiceImpl;
+import org.prth.dao.EmployeeDaoImpl;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -14,51 +15,39 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public class EmployeeController {
 
-    private final EmployeeService employeeService = new EmployeeServiceImpl();
+    private final EmployeeService employeeService = new EmployeeServiceImpl(new EmployeeDaoImpl());
 
-    @GET
-    @Path("/all")
-    public List<Employee> getAllEmployees() {
-        return employeeService.getAllEmployees();
+    public EmployeeController() throws Exception {
     }
 
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String test() {
-        return "API is working!";
+    public Response getAllEmployees() {
+        List<Employee> employees = employeeService.getAllEmployees();
+        return Response.ok(employees).build();
     }
 
     @GET
     @Path("/{id}")
     public Response getEmployeeById(@PathParam("id") int id) {
-        Employee emp = employeeService.getEmployeeById(id);
-        if (emp != null) {
-            return Response.ok(emp).build();
+        Employee employee = employeeService.getEmployeeById(id);
+        if (employee != null) {
+            return Response.ok(employee).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity("Employee not found").build();
         }
     }
 
     @POST
-    public Response addEmployee(Employee emp) {
-        boolean added = employeeService.addEmployee(emp);
-        if (added) {
-            return Response.status(Response.Status.CREATED).entity(emp).build();
-        } else {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to create employee").build();
-        }
+    public Response addEmployee(Employee employee) {
+        Employee savedEmployee = employeeService.addEmployee(employee);
+        return Response.status(Response.Status.CREATED).entity(savedEmployee).build();
     }
 
     @PUT
     @Path("/{id}")
-    public Response updateEmployee(@PathParam("id") int id, Employee emp) {
-        emp.setId(id);
-        boolean updated = employeeService.updateEmployee(emp);
-        if (updated) {
-            return Response.ok(emp).build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND).entity("Employee not found").build();
-        }
+    public Response updateEmployee(@PathParam("id") int id, Employee employee) {
+        Employee updatedEmployee = employeeService.updateEmployee(id, employee);
+        return Response.ok(updatedEmployee).build();
     }
 
     @DELETE
@@ -70,5 +59,12 @@ public class EmployeeController {
         } else {
             return Response.status(Response.Status.NOT_FOUND).entity("Employee not found").build();
         }
+    }
+
+    @GET
+    @Path("/salary")
+    public Response getEmployeesWithMinSalary(@QueryParam("minSalary") int minSalary) {
+        List<Employee> employees = employeeService.getEmployeesWithMinSalary(minSalary);
+        return Response.ok(employees).build();
     }
 }
