@@ -64,7 +64,7 @@ public class SPAAController {
     }
 
     @GET
-    @Path("/getEmployeesByCity")
+    @Path("/getSpaaByTag")
     public Response getSpaaByTag(@QueryParam("tag") String tag) {
         List<SPAA> SPAAS = spaaService.getSpaaByTag(tag);
         return Response.ok(SPAAS).build();
