@@ -6,6 +6,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.concurrent.CountDownLatch;
 
 public class Main {
     public static final String BASE_URI = "http://localhost:8080/api/";
@@ -15,15 +16,15 @@ public class Main {
         return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         final HttpServer server = startServer();
         System.out.println("Jersey app started at " + BASE_URI);
         System.out.println("Press Ctrl+C to stop the server...");
-        Runtime.getRuntime().addShutdownHook(new Thread(server::shutdownNow));
-        try {
-            Thread.currentThread().join();
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
+        CountDownLatch latch = new CountDownLatch(1);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            server.shutdownNow();
+            latch.countDown();
+        }));
+        latch.await();
     }
 }
